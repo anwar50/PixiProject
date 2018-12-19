@@ -1,0 +1,99 @@
+var Width = 850
+var Height = 600
+var application1 = new PIXI.Application(Width, Height, {backgroundColor : 0x1099bb});
+document.body.appendChild(application1.view);
+
+// create a texture from an image path
+// create a new Sprite from an image path
+var avatar = PIXI.Sprite.fromImage('Documents/ADSOOF/js/avatar.png');
+var avatar2 = PIXI.Texture.fromImage('Documents/ADSOOF/js/avatar2.png');
+//create text 
+var text1 = new PIXI.Text('Hi my name is Anwar and I am an enthusiastic programmer ');
+text1.x = 30;
+text1.y = 95;
+// center the sprite's anchor point
+avatar.anchor.set(0.5);
+// move the sprite to the center of the screen
+avatar.x = application1.screen.width / 2;
+avatar.y = application1.screen.height / 2;
+application1.stage.addChild(avatar);
+application1.stage.addChild(text1);
+
+//creating the style of text through pixi
+var styler = new PIXI.TextStyle({
+	fontSize: 15,
+	fontStyle: 'italic',
+	fontWeight: 'bold',
+	fill: ['red', 'black'],
+	stroke: 'yellow',
+	fontFamily: 'Arial'
+	
+	
+});
+
+// Listen for animate update
+application1.ticker.add(function(a) {
+    // creates frame-independent transformation
+    avatar.rotation += 0.1 * a;
+});
+
+// Scale mode for pixelation
+avatar2.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+
+//randomly place the avatars around the screen 5 times.
+for (var i = 0; i < 5; i++) {
+    createAvatar(
+        Math.floor(Math.random() * application1.screen.width),
+        Math.floor(Math.random() * application1.screen.height)
+    );
+}
+
+function createAvatar(x, y) {
+
+    // create our little bunny friend..
+    var avatar3 = new PIXI.Sprite(avatar2);
+    // enable the bunny to be interactive... this will allow it to respond to mouse and touch events
+    avatar3.interactive = true;
+    // this button mode will mean the hand cursor appears when you roll over the bunny with your mouse
+    avatar3.buttonMode = true;
+    // center the bunny's anchor point
+    avatar3.anchor.set(0.5);
+    // make it a bit bigger, so it's easier to grab
+    avatar3.scale.set(3);
+    // setup events for mouse + touch using
+    // the pointer events
+    avatar3
+        .on('pointerdown', onDragStart)
+        .on('pointerup', onDragEnd)
+        .on('pointerupoutside', onDragEnd)
+        .on('pointermove', onDragMove);
+    // move the sprite to its designated position
+    avatar3.x = x;
+    avatar3.y = y;
+
+    // add it to the stage
+    application1.stage.addChild(avatar3);
+}
+
+function onDragStart(event) {
+    // store a reference to the data
+    // the reason for this is because of multitouch
+    // we want to track the movement of this particular touch
+    this.data = event.data;
+    this.alpha = 0.5;
+    this.dragging = true;
+}
+function onDragEnd() {
+    this.alpha = 1;
+    this.dragging = false;
+    // set the interaction data to null
+    this.data = null;
+}
+	//moves the avatar
+function onDragMove() {
+    if (this.dragging) {
+        var newPosition = this.data.getLocalPosition(this.parent);
+        this.x = newPosition.x;
+        this.y = newPosition.y;
+    }
+}
